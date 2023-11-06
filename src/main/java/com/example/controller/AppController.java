@@ -63,6 +63,11 @@ public class AppController {
 				redirectAttributes.addFlashAttribute("error", Message.MSG_VALIDATE_ERROR);
 				return "redirect:/apps";
 			}
+			if (!isURLValid(entity.getUrl())) {
+				// NG
+				redirectAttributes.addFlashAttribute("error", Message.MSG_VALIDATE_ERROR);
+				return "redirect:/apps";
+			}
 
 			app = appService.save(entity);
 			redirectAttributes.addFlashAttribute("success", Message.MSG_SUCESS_INSERT);
@@ -72,6 +77,10 @@ public class AppController {
 			e.printStackTrace();
 			return "redirect:/apps";
 		}
+	}
+
+	private boolean isURLValid(String url) {
+		return url.matches("^(https?|ftp)(:\\/\\/)[-_.!~*\\'()a-zA-Z0-9;\\/?:\\@&=+\\$,%#]+$");
 	}
 
 	@GetMapping("/{id}/edit")
