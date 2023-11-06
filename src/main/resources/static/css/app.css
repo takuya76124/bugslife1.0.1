@@ -28,6 +28,11 @@ a.btn {
   cursor: default;
 }
 
+a.btn.btn-danger {
+  display: block;
+  width: 90px;
+}
+
 a.btn-link {
   font-weight: 700;
   height: 36px;

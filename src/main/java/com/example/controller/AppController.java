@@ -123,8 +123,12 @@ public class AppController {
 		try {
 			if (id != null) {
 				Optional<App> entity = appService.findOne(id);
-				appService.delete(entity.get());
-				redirectAttributes.addFlashAttribute("success", Message.MSG_SUCESS_DELETE);
+				if (entity.isPresent()) {
+					appService.delete(entity.get());
+					redirectAttributes.addFlashAttribute("success", Message.MSG_SUCESS_DELETE);
+				} else {
+					redirectAttributes.addFlashAttribute("error", "App not found.");
+				}
 			}
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("error", Message.MSG_ERROR);
