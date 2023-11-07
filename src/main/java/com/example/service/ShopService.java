@@ -16,6 +16,10 @@ public class ShopService {
 	@Autowired
 	private ShopRepository shopRepository;
 
+	public List<Shop> findByNameContaining(String name) {
+		return shopRepository.findByNameContaining(name);
+	}
+
 	public List<Shop> findAll() {
 		return shopRepository.findAll();
 	}
