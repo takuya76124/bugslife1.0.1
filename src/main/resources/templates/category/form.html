@@ -11,19 +11,24 @@
 
     <div class="form-group">
       <label for="code">コード</label>
-      <input id="code" name="code" type="text" class="form-control" th:field="*{code}" />
+      <input id="code" name="code" type="text" class="form-control" th:field="*{code}"
+        placeholder="半角大文字アルファベット3文字 + ハイフン + 半角数字3文字の形式で入力してください。" pattern="[A-Z]{3}-\d{3}"
+        title="半角大文字アルファベット3文字 + ハイフン + 半角数字3文字の形式で入力してください。" required />
     </div>
     <div class="form-group">
       <label for="name">名前</label>
-      <input id="name" name="name" type="text" class="form-control" th:field="*{name}" />
+      <input id="name" name="name" type="text" class="form-control" th:field="*{name}"
+        placeholder="1文字以上、20文字以内で入力してください。" minlength="1" maxlength="20" title="1文字以上、20文字以内で入力してください。" required />
     </div>
     <div class="form-group">
       <label for="display_order">表示順</label>
-      <input id="display_order" name="display_order" type="number" class="form-control" th:field="*{displayOrder}" />
+      <input id="display_order" name="display_order" type="number" class="form-control" th:field="*{displayOrder}"
+        placeholder="0以上、999以下の数値を入力してください。" min="0" max="999" title="0以上、999以下の数値を入力してください。" required />
     </div>
     <div class="form-group">
-      <label>説明</label>
-      <textarea class="form-control"></textarea>
+      <label for="description">説明</label>
+      <textarea id="description" name="description" class="form-control" maxlength="300"
+        placeholder="任意: 300文字以内で入力してください。" th:field="*{description}"></textarea>
     </div>
 
     <input id="submit" type="submit" class="btn btn-success" value="保存">
@@ -32,3 +37,4 @@
 </th:block>
 
 </html>
+<script src="/js/category/category-form.js"></script>
