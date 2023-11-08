@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,11 +33,9 @@ public class ShopController {
 
 	@GetMapping
 	public String index(Model model, @RequestParam(name = "name", required = false) Optional<String> name) {
-		List<Shop> shops;
-		if (name.isPresent()) {
+		List<Shop> shops = new ArrayList<>();
+		if (name.isPresent() && !name.get().trim().isEmpty()) {
 			shops = shopService.findByNameContaining(name.get());
-		} else {
-			shops = shopService.findAll();
 		}
 		model.addAttribute("listShop", shops);
 		model.addAttribute("name", name.isPresent() ? name.get() : null);
