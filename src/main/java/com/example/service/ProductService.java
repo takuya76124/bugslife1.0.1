@@ -17,6 +17,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 
 import com.example.entity.ProductWithCategoryName;
 import com.example.form.ProductForm;
@@ -86,11 +87,17 @@ public class ProductService {
 			query.where(builder.like(root.get("code"), "%" + form.getCode() + "%"));
 		}
 
-		if (form.getCategories() != null && form.getCategories().size() > 0) {
-			// categories で完全一致検索
-			query.where(categoryJoin.get("id").in(form.getCategories()));
-		} else {
+		if (form.getCategories() != null && !form.getCategories().isEmpty()) {
+			List<Long> multipleCategories = form.getCategories();
 
+			Subquery<Long> subquery = query.subquery(Long.class);
+			Root<CategoryProduct> subRoot = subquery.from(CategoryProduct.class);
+			subquery.select(subRoot.get("product").get("id"))
+					.where(subRoot.get("category").get("id").in(multipleCategories))
+					.groupBy(subRoot.get("product").get("id"))
+					.having(builder.equal(builder.count(subRoot.get("product").get("id")), multipleCategories.size()));
+
+			query.where(root.get("id").in(subquery));
 		}
 
 		// weight で範囲検索
