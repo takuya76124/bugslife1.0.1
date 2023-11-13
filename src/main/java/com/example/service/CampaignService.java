@@ -117,18 +117,21 @@ public class CampaignService {
 	 * @param nexStatus 更新後ステータス
 	 * @throws Exception
 	 */
-	@Transactional(readOnly = false, rollbackFor = RuntimeException.class)
+	@Transactional(readOnly = false, rollbackFor = Exception.class)
 	public void bulkStatusUpdate(List<Long> idList, CampaignStatus nexStatus) throws Exception {
+		List<Campaign> updateCampaigns = new ArrayList<>();
 		try {
-			idList.forEach(id -> {
-				Campaign campaign = campaignRepository.findById(id).get();
+			for (Long id : idList) {
+				Campaign campaign = campaignRepository.findById(id)
+						.orElseThrow(() -> new RuntimeException("キャンペーンが見つかりません。"));
 				// 更新前後のステータスが同じ場合はエラー
 				if (nexStatus.getId() == campaign.getStatus().getId()) {
 					throw new RuntimeException(campaign.getName() + "にステータスの変更がないため、ステータスの一括更新に失敗しました。");
 				}
 				campaign.setStatus(nexStatus);
-				campaignRepository.save(campaign);
-			});
+				updateCampaigns.add(campaign);
+			}
+			campaignRepository.saveAll(updateCampaigns);
 		} catch (RuntimeException e) {
 			throw new Exception(e.getMessage());
 		}
