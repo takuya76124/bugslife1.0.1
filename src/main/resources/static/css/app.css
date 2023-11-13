@@ -15,8 +15,9 @@
 
 /* 詳細 */
 span.font-impact {
-  font-family: "Impact";
-  font-size: small;
+  font-family: "Verdana, Arial, sans-serif";
+  white-space: pre-wrap;
+  overflow: hidden;
 }
 
 a.btn {
@@ -56,9 +57,6 @@ a.btn-link {
     height: 3000px;
   }
 
-  span.font-impact {
-    font-size: x-large;
-  }
 }
 
 /* スマホ */
@@ -73,7 +71,4 @@ a.btn-link {
     width: 1500px;
   }
 
-  span.font-impact {
-    font-size: xx-large;
-  }
 }
