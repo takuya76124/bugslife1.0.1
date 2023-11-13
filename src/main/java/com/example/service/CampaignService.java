@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +66,7 @@ public class CampaignService {
 	 */
 	@Transactional
 	public void importCSV(MultipartFile file) throws IOException {
+		List<Campaign> campaigns = new ArrayList<>();
 		try (BufferedReader br = new BufferedReader(
 				new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
 			String line = br.readLine(); // 1行目はヘッダーなので読み飛ばす
@@ -75,11 +77,12 @@ public class CampaignService {
 						split[0], split[1], split[2], split[3],
 						DiscountType.valueOf(Integer.parseInt(split[4])),
 						CampaignStatus.valueOf(Integer.parseInt(split[5])), split[6]);
-				campaignRepository.save(campaign);
+				campaigns.add(campaign);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("ファイルが読み込めません", e);
 		}
+		batchInsert(campaigns);
 	}
 
 	/**
@@ -92,16 +95,19 @@ public class CampaignService {
 		String sql = "INSERT INTO campaigns (name, code, from_date, to_date, discount_type, status, description, create_at, update_at)"
 				+ " VALUES(:name, :code, :from_date, :to_date, :discount_type, :status, :description, :create_at, :update_at)";
 		// FIXME: ここでエラーが出る インサート文の問題？
-		return jdbcTemplate.batchUpdate(sql,
-				campaigns.stream()
-						.map(c -> new MapSqlParameterSource()
-								.addValue("name", c.getName(), Types.VARCHAR)
-								.addValue("code", c.getCode(), Types.VARCHAR)
-								.addValue("from_date", c.getFromDate(), Types.VARCHAR)
-								.addValue("discount_type", c.getDiscountType().getId(), Types.TINYINT)
-								.addValue("description", c.getDescription(), Types.VARCHAR)
-								.addValue("create_at", new Date(), Types.TIMESTAMP))
-						.toArray(SqlParameterSource[]::new));
+		SqlParameterSource[] params = campaigns.stream()
+				.map(c -> new MapSqlParameterSource()
+						.addValue("name", c.getName(), Types.VARCHAR)
+						.addValue("code", c.getCode(), Types.VARCHAR)
+						.addValue("from_date", c.getFromDate(), Types.VARCHAR)
+						.addValue("to_date", c.getFromDate(), Types.VARCHAR)
+						.addValue("discount_type", c.getDiscountType().getId(), Types.TINYINT)
+						.addValue("status", c.getStatus().getId(), Types.TINYINT)
+						.addValue("description", c.getDescription(), Types.VARCHAR)
+						.addValue("create_at", new Date(), Types.TIMESTAMP)
+						.addValue("update_at", new Date(), Types.TIMESTAMP))
+				.toArray(SqlParameterSource[]::new);
+		return jdbcTemplate.batchUpdate(sql, params);
 	}
 
 	/**
